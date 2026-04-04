@@ -1,0 +1,20 @@
+{
+  "name": "trangtin",
+  "version": "1.0.0",
+  "description": "Trang tin điện tử _ MongoDB Atlas",
+  "license": "ISC",
+  "author": "Ngô Thanh Hiệp",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon index.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "ejs": "^5.0.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "mongoose": "^9.3.2",
+    "nodemon": "^3.1.14"
+  }
+}
