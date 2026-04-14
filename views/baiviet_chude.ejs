@@ -9,6 +9,9 @@
     <title>
         <%= title %> - Trang tin điện tử
     </title>
+    <style>
+        .article-thumb-fixed { width: 100%; height: 220px; object-fit: cover; }
+    </style>
 </head>
 
 <body>
@@ -33,12 +36,10 @@
                         <% if (baiviet && baiviet.length > 0) { %>
                             <% baiviet.forEach(bv => { %>
                                 <div class="card mb-3">
-                                    <% if (bv.firstImage && bv.firstImage !== '/images/noimage.png') { %>
-                                        <img src="<%- bv.firstImage %>" alt="<%= bv.TieuDe %>" class="card-img-top" style="max-height: 200px; object-fit: cover;" onerror="this.src='/images/noimage.png'">
-                                    <% } %>
+                                    <img src="<%- bv.displayImage || '/images/noimage.png' %>" alt="<%= bv.TieuDe %>" class="card-img-top article-thumb-fixed" onerror="this.src='/images/noimage.png'">
                                     <div class="card-body">
                                         <h5 class="card-title"><a href="/baiviet/<%= bv._id %>" class="text-decoration-none"><%= bv.TieuDe %></a></h5>
-                                        <p class="card-text"><%= bv.TomTat %></p>y
+                                        <p class="card-text"><%= bv.TomTat %></p>
                                         <p class="card-text"><small class="text-muted">
                                             Chủ đề: <%= bv.ChuDe ? bv.ChuDe.TenChuDe : 'N/A' %> | 
                                             Tác giả: <%= bv.TaiKhoan ? bv.TaiKhoan.TenDangNhap : 'N/A' %> | 

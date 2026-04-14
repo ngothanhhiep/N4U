@@ -6,81 +6,276 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
-    <title>
-        <%= title %> - Trang tin điện tử
-    </title>
+    <title><%= title %> - Trang tin điện tử</title>
+    <style>
+        /* Hiệu ứng phóng to nhẹ khi hover vào bài viết */
+        .article-card { transition: transform 0.2s, box-shadow 0.2s; border: none; }
+        .article-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
+        
+        /* Cấu trúc Slide */
+        #heroCarousel .carousel-item { 
+            height: 450px; 
+            background-color: #000; 
+            position: relative; 
+        }
+
+        #heroCarousel .carousel-item img { 
+            height: 100%; 
+            width: 100%;
+            object-fit: cover; 
+            z-index: 1; /* Nằm dưới cùng */
+            position: relative;
+            /* Xóa filter: brightness(70%) cũ ở đây để ảnh trên cùng được sáng */
+        }
+
+        /* LỚP PHỦ ĐEN GRADIENT (Chỉ chiếm 2/3 hình ảnh từ dưới lên) */
+        #heroCarousel .carousel-item::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%; 
+            /* Tối đậm ở đáy, biến mất hoàn toàn ở điểm 66.6% (2/3) */
+            background: linear-gradient(to top, 
+                rgba(0, 0, 0, 0.9) 0%, 
+                rgba(0, 0, 0, 0.6) 35%, 
+                rgba(0, 0, 0, 0) 66.6% 
+            );
+            z-index: 2; /* Nằm trên ảnh */
+        }
+
+        /* Nội dung chữ (Caption) */
+        #heroCarousel .carousel-caption { 
+            z-index: 3; /* Nằm trên cả lớp phủ đen */
+            bottom: 10%; 
+            text-align: left; 
+            left: 8%; 
+            right: 8%; 
+        }
+
+        #heroCarousel .carousel-caption h1 {
+            font-weight: 700;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5); /* Giúp chữ nổi bật hơn */
+        }
+
+        .article-thumb-fixed {
+            width: 100%;
+            height: 190px;
+            object-fit: cover;
+        }
+    </style>
 </head>
 
-<body>
-    <div class="container">
-        <!-- Menu ngang -->
+<body class="bg-light">
+    <div class="container bg-white shadow-sm px-0">
         <%- include('navbar') %>
 
-        <!-- Nội dung chính -->
-        <div class="card mt-3">
-            <div class="card-header">
-                <%= title %>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-8">
-                        <h4>Bài viết mới nhất</h4>
-                        <% if (baiviet && baiviet.length > 0) { %>
-                            <% baiviet.forEach(bv => { %>
-                                <div class="card mb-3">
-                                    <% if (bv.firstImage && bv.firstImage !== '/images/noimage.png') { %>
-                                        <img src="<%- bv.firstImage %>" alt="<%= bv.TieuDe %>" class="card-img-top" style="max-height: 200px; object-fit: cover;" onerror="this.src='/images/noimage.png'">
-                                    <% } %>
-                                    <div class="card-body">
-                                        <h5 class="card-title"><a href="/baiviet/<%= bv._id %>" class="text-decoration-none"><%= bv.TieuDe %></a></h5>
-                                        <p class="card-text"><%= bv.TomTat %></p>
-                                        <p class="card-text"><small class="text-muted">
-                                            Chủ đề: <%= bv.ChuDe ? bv.ChuDe.TenChuDe : 'N/A' %> | 
-                                            Tác giả: <%= bv.TaiKhoan ? bv.TaiKhoan.TenDangNhap : 'N/A' %> | 
-                                            Ngày đăng: <%= new Date(bv.NgayDang).toLocaleDateString('vi-VN') %> | 
-                                            Lượt xem: <%= bv.LuotXem %>
-                                        </small></p>
-                                    </div>
-                                </div>
-                            <% }); %>
-                        <% } else { %>
-                            <p>Không có bài viết nào.</p>
-                        <% } %>
-                    </div>
-                    <div class="col-md-4">
-                        <h4>Chủ đề</h4>
-                        <div class="mb-4">
-                            <% if (chuyenmuc && chuyenmuc.length > 0) { %>
-                                <% chuyenmuc.forEach(cm => { %>
-                                    <a href="/chude/<%= cm._id %>" class="badge bg-primary text-decoration-none me-2 mb-2"><%= cm.TenChuDe %></a>
-                                <% }); %>
-                            <% } else { %>
-                                <p>Không có chủ đề nào.</p>
-                            <% } %>
+        <% if (baiviet && baiviet.length > 0) 
+        { %>
+            <div id="heroCarousel" class="carousel slide carousel-fade mb-4 shadow-sm" data-bs-ride="carousel">
+                
+                <div class="carousel-indicators" style="z-index: 4;">
+                    <% baiviet.slice(0, 5).forEach((_, index) => { %>
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="<%= index %>" class="<%= index === 0 ? 'active' : '' %>" aria-label="Slide <%= index + 1 %>"></button>
+                    <% }) %>
+                </div>
+
+                <div class="carousel-inner rounded-bottom">
+                    <% baiviet.slice(0, 5).forEach((bv, index) => { %>
+                        <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                            
+                            <img src="<%- bv.HinhAnh || '/images/noimage.png' %>" class="d-block w-100" alt="<%= bv.TieuDe %>">
+                            
+                            <div class="carousel-caption d-none d-md-block">
+                                <span class="badge bg-warning text-dark mb-3 px-3 py-2 rounded-pill fw-bold text-uppercase" style="font-size: 0.7rem;">
+                                    <i class="bi bi-tag-fill me-1"></i><%= bv.ChuDe ? bv.ChuDe.TenChuDe : 'Tin tức' %>
+                                </span>
+                                
+                                <h1 class="display-5 fw-bold mb-2"><%= bv.TieuDe %></h1>
+                                
+                                <p class="lead fw-normal mb-4 text-truncate-2">
+                                    <%= bv.TomTat %>
+                                </p>
+                                
+                                <a href="/baiviet/<%= bv._id %>" class="btn btn-primary btn-readmore rounded-pill px-4 shadow">
+                                    Đọc bài viết <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
                         </div>
-                        <h4>Bài viết xem nhiều</h4>
-                        <% if (xemnhieu && xemnhieu.length > 0) { %>
-                            <% xemnhieu.forEach(xn => { %>
-                                <div class="card mb-3">
-                                    <div class="card-body">
-                                        <h6 class="card-title"><a href="/baiviet/<%= xn._id %>" class="text-decoration-none"><%= xn.TieuDe %></a></h6>
-                                        <p class="card-text"><small class="text-muted">Lượt xem: <%= xn.LuotXem %></small></p>
+                    <% }); %>
+                </div>
+
+                <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" style="z-index: 5;">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Trước</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" style="z-index: 5;">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Sau</span>
+                </button>
+            </div>
+        <% } %>
+
+        <div class="container py-4">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-bold border-start border-primary border-4 ps-2 text-uppercase">Bài viết mới nhất</h4>
+                        <a href="/tinmoi" class="text-decoration-none small text-muted">Xem tất cả <i class="bi bi-arrow-right"></i></a>
+                    </div>
+
+                    <% if (baiviet && baiviet.length > 0) { %>
+                        <div class="row row-cols-1 g-4">
+                            <% baiviet.forEach(bv => { %>
+                                <div class="col">
+                                    <div class="card article-card shadow-sm h-100 position-relative">
+                                        <div class="row g-0 align-items-center">
+                                            <div class="col-md-4">
+                                                <img src="<%- bv.HinhAnh || '/images/noimage.png' %>" class="img-fluid rounded-start article-thumb-fixed" onerror="this.src='/images/noimage.png'">
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="card-body d-flex flex-column h-100">
+                                                    <div class="mb-3">
+                                                        <h5 class="card-title">
+                                                            <a href="/baiviet/<%= bv._id %>" class="text-decoration-none text-dark fw-bold">
+                                                                <%= bv.TieuDe %>
+                                                            </a>
+                                                        </h5>
+                                                        <p class="card-text text-muted small">
+                                                            <%= bv.TomTat.substring(0, 120) %>...
+                                                        </p>
+                                                    </div>
+
+                                                    <div class="mt-auto d-flex justify-content-between align-items-end border-top pt-2">
+                                                        <div>
+                                                            <span class="badge bg-info-subtle text-primary border border-info-subtle text-uppercase" style="font-size: 0.7rem;">
+                                                                <i class="bi bi-tag-fill me-1"></i><%= bv.ChuDe ? bv.ChuDe.TenChuDe : 'N/A' %>
+                                                            </span>
+                                                        </div>
+
+                                                        <div class="text-end small text-muted" style="font-size: 0.8rem;">
+                                                            <div class="mb-1">
+                                                                <i class="bi bi-person-circle text-primary"></i> 
+                                                                <span class="fw-medium text-dark"><%= bv.TaiKhoan ? bv.TaiKhoan.HoVaTen : 'Ẩn danh' %></span>
+                                                            </div>
+                                                            <div>
+                                                                <i class="bi bi-calendar3 me-1"></i><%= new Date(bv.NgayDang).toLocaleDateString('vi-VN') %>
+                                                                <span class="mx-1">|</span>
+                                                                <i class="bi bi-eye me-1"></i><%= bv.LuotXem %>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             <% }); %>
-                        <% } else { %>
-                            <p>Không có bài viết nào.</p>
-                        <% } %>
+                        </div>
+                    <% } else { %>
+                        <div class="alert alert-light text-center py-5">
+                            <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                            <p>Không có bài viết nào được tìm thấy.</p>
+                        </div>
+                    <% } %>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card mb-4 border-0 shadow-sm">
+                        <div class="card-header bg-white fw-bold"><i class="bi bi-grid-fill text-primary me-2"></i>Chủ đề phổ biến</div>
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap gap-2">
+                                <% if (chuyenmuc && chuyenmuc.length > 0) { %>
+                                    <% chuyenmuc.forEach(cm => { %>
+                                        <a href="/chude/<%= cm._id %>" class="btn btn-sm btn-outline-secondary rounded-pill"><%= cm.TenChuDe %></a>
+                                    <% }); %>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <% if (quangcao) { %>
+                        <div class="card mb-4 border-0 shadow-sm overflow-hidden">
+                            <div class="card-header bg-white fw-bold border-0 pt-3">
+                                <i class="bi bi-megaphone-fill text-warning me-2"></i>Quảng cáo ngẫu nhiên
+                            </div>
+                            <div class="card-body p-0">
+                                <% if (quangcao.LinkQuangCao) { %>
+                                    <a href="<%= quangcao.LinkQuangCao %>" target="_blank" rel="noopener noreferrer" class="text-decoration-none d-block">
+                                        <img src="<%- quangcao.HinhAnh || '/images/noimage.png' %>"
+                                             alt="<%= quangcao.TenQuangCao %>"
+                                             class="w-100"
+                                             style="max-height: 220px; object-fit: cover;"
+                                             onerror="this.src='/images/noimage.png'">
+                                        <div class="p-3">
+                                            <div class="fw-semibold text-dark"><%= quangcao.TenQuangCao %></div>
+                                        </div>
+                                    </a>
+                                <% } else { %>
+                                    <img src="<%- quangcao.HinhAnh || '/images/noimage.png' %>"
+                                         alt="<%= quangcao.TenQuangCao %>"
+                                         class="w-100"
+                                         style="max-height: 220px; object-fit: cover;"
+                                         onerror="this.src='/images/noimage.png'">
+                                    <div class="p-3">
+                                        <div class="fw-semibold text-dark"><%= quangcao.TenQuangCao %></div>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% } %>
+
+                    <div class="card mb-4 border-0 shadow-sm">
+                        <div class="card-header bg-white fw-bold border-0 pt-3">
+                            <i class="bi bi-fire text-danger me-2"></i>Xem nhiều nhất
+                        </div>
+                        <div class="card-body p-0">
+                            <ul class="list-group list-group-flush">
+                                <% if (xemnhieu && xemnhieu.length > 0) { %>
+                                    <% xemnhieu.forEach((xn, index) => { %>
+                                        <li class="list-group-item py-3 article-card border-0">
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-3">
+                                                    <span class="fs-5 fw-bold text-secondary-emphasis">
+                                                        <%= (index + 1) < 10 ? '0' + (index + 1) : (index + 1) %>
+                                                    </span>
+                                                </div>
+                                                
+                                                <div class="flex-shrink-0 me-3">
+                                                    <img src="<%- xn.HinhAnh || '/images/noimage.png' %>" 
+                                                        alt="<%= xn.TieuDe %>" 
+                                                        class="rounded"
+                                                        style="width: 60px; height: 60px; object-fit: cover;"
+                                                        onerror="this.src='/images/noimage.png'">
+                                                </div>
+
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1 fw-bold" style="line-height: 1.4;">
+                                                        <a href="/baiviet/<%= xn._id %>" class="text-decoration-none text-dark small d-block" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                                            <%= xn.TieuDe %>
+                                                        </a>
+                                                    </h6>
+                                                    <small class="text-muted" style="font-size: 0.75rem;">
+                                                        <i class="bi bi-eye me-1"></i><%= xn.LuotXem.toLocaleString('vi-VN') %> lượt xem
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    <% }); %>
+                                <% } else { %>
+                                    <li class="list-group-item text-center text-muted small py-3">Chưa có dữ liệu</li>
+                                <% } %>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Footer -->
         <%- include('footer') %>
     </div>
 
-    <!-- Java Script -->
     <%- include('javascript')%>
 </body>
 

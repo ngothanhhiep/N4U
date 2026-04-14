@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const BaiViet = require('./models/baiviet');
 const firstImage = require('./modules/firstimage');
-const uri = 'mongodb://user:user123456@ac-dfhjs7r-shard-00-01.kyxw2pa.mongodb.net:27017/trangtin?ssl=true&authSource=admin';
+const uri = 'mongodb://user:user123456@ac-dfhjs7r-shard-00-01.kyxw2pa.mongodb.net:27017/NimbleNewNowNetworkForYou?ssl=true&authSource=admin';
 
 (async () => {
   try {

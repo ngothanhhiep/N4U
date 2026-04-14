@@ -22,7 +22,7 @@
                     <%= title %>
                 </div>
                 <div class="card-body">
-                    <form action="/baiviet/sua/<%= baiviet._id %>" method="post" class="needs-validation" novalidate>
+                    <form action="/baiviet/sua/<%= baiviet._id %>" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
                         <div class="mb-3">
                             <label for="MaChuDe" class="form-label">Chủ đề</label>
                             <select class="form-select" id="MaChuDe" name="MaChuDe" required>
@@ -55,6 +55,20 @@
                             <textarea class="form-control" id="NoiDung" name="NoiDung"
                                 required><%= baiviet.NoiDung %></textarea>
                         </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Ảnh hiện tại</label>
+                            <div class="mb-2">
+                                <img id="imgPreview" src="<%- baiviet.HinhAnh || '/images/noimage.png' %>" alt="Ảnh bài viết"
+                                    class="img-thumbnail" style="max-width: 280px; max-height: 180px; object-fit: cover;">
+                            </div>
+                            <input type="url" class="form-control mb-2" id="HinhAnhLink" name="HinhAnhLink"
+                                value="<%= baiviet.HinhAnh || '' %>" placeholder="Dán link ảnh mới (tùy chọn)" />
+                            <input type="file" class="form-control" id="HinhAnh" name="HinhAnh" accept="image/*"
+                                onchange="previewImage(event)" />
+                            <div class="form-text">Bạn có thể sửa bằng link hoặc upload file. Nếu chọn file, hệ thống ưu tiên file.</div>
+                        </div>
+
                         <button type="submit" class="btn btn-primary"><i class="bi bi-cloud-arrow-up"></i> Cập nhật bài
                             viết</button>
                     </form>
@@ -69,6 +83,20 @@
         <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
         <script>
             CKEDITOR.replace('NoiDung', {
-                customConfig: 'http://127.0.0.1:3000/js/config.js'
+                customConfig: '/js/config.js'
             });
+
+            function previewImage(event) {
+                var reader = new FileReader();
+                reader.onload = function () {
+                    var output = document.getElementById('imgPreview');
+                    output.src = reader.result;
+                };
+                if (event.target.files[0]) {
+                    reader.readAsDataURL(event.target.files[0]);
+                }
+            }
         </script>
+</body>
+
+</html>

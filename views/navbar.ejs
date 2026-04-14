@@ -1,57 +1,101 @@
-<nav class="navbar navbar-expand-lg bg-info">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/"><i class="bi bi-star"></i> iNews</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-            aria-expanded="false">
+<nav class="navbar navbar-expand-lg navbar-dark shadow-sm py-2" style="background-color: #6EB5FF;">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">
+            <img src="https://res.cloudinary.com/dzxouue97/image/upload/v1776106247/N4ULogo-removebg_d5gmdn"
+                 alt="N4U Logo"
+                 style="height: 40px; width: auto; object-fit: contain;"
+                 loading="lazy">
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
             <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" href="/tinmoi"><i class="bi bi-compass"></i> Tin mới nhất</a>
+                    <a class="nav-link active" href="/tinmoi">
+                        <i class="bi bi-compass me-1"></i> Tin mới nhất
+                    </a>
                 </li>
-                <% if(typeof session==="undefined" || !session.MaNguoiDung) { %>
+                </ul>
+
+            <form action="/timkiem" class="d-flex mx-lg-3 my-2 my-lg-0" role="search">
+                <div class="input-group">
+                    <input class="form-control form-control-sm border-0" type="search" name="tukhoa" placeholder="Tìm kiếm tin tức..." />
+                    <button class="btn btn-success btn-sm" type="submit"><i class="bi bi-search"></i></button>
+                </div>
+            </form>
+
+            <ul class="navbar-nav ms-auto align-items-center">
+                <% if(typeof session === "undefined" || !session.MaNguoiDung) { %>
                     <li class="nav-item">
-                        <a class="nav-link" href="/dangky"><i class="bi bi-person-plus-fill"></i> Đăng ký</a>
+                        <a class="nav-link" href="/dangnhap">Đăng nhập</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/dangnhap"><i class="bi bi-box-arrow-in-right"></i> Đăng nhập</a>
+                        <a class="btn btn-outline-light btn-sm ms-lg-2" href="/dangky">Đăng ký</a>
                     </li>
                 <% } else { %>
-                    <% if(session.QuyenHan=="admin") { %>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                                <i class="bi bi-gear"></i> Quản lý
+                    
+                    <% if(session.QuyenHan == "admin" || session.QuyenHan == "maneger") { %>
+                        <li class="nav-item dropdown me-2">
+                            <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-gear-fill"></i> Quản lý
                             </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="/chude"><i class="bi bi-card-checklist"></i> Chủ đề</a></li>
-                                <li><a class="dropdown-item" href="/taikhoan"><i class="bi bi-people"></i> Tài khoản</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                <% if(session.QuyenHan == "admin") { %>
+                                    <li><a class="dropdown-item" href="/chude"><i class="bi bi-card-checklist me-2"></i>Chủ đề</a></li>
+                                    <li><a class="dropdown-item" href="/taikhoan"><i class="bi bi-people me-2"></i>Tài khoản</a></li>
+                                <% } %>
+                                <li><a class="dropdown-item" href="/binhluan"><i class="bi bi-chat-dots me-2"></i>Bình luận</a></li>
+                                <li><a class="dropdown-item" href="/quangcao"><i class="bi bi-megaphone me-2"></i>Quảng cáo</a></li>
+                                <li><a class="dropdown-item" href="/report"><i class="bi bi-graph-up-arrow me-2"></i>Report</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="/baiviet"><i class="bi bi-file-earmark-richtext"></i> Bài viết</a></li>
+                                <li><a class="dropdown-item" href="/baiviet"><i class="bi bi-file-earmark-richtext me-2"></i>Bài viết</a></li>
+                                <li><a class="dropdown-item" href="/baiviet/them"><i class="bi bi-plus-square me-2"></i>Thêm bài viết</a></li>
                             </ul>
                         </li>
                     <% } %>
+
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-person"></i> <%= session.HoVaTen %>
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                            <% if(session.HinhAnh) { %>
+                                <img src="<%= session.HinhAnh %>" 
+                                    class="rounded-circle me-2 shadow-sm" 
+                                    style="width: 32px; height: 32px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2);"
+                                    alt="<%= session.HoVaTen %>">
+                            <% } else { %>
+                                <i class="bi bi-person-circle fs-5 me-1"></i>
+                            <% } %>
+                            <span><%= session.HoVaTen %></span>
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/baiviet/them"><i class="bi bi-file-earmark-plus"></i> Đăng bài viết</a></li>
-                            <li><a class="dropdown-item" href="/baiviet/cuatoi"><i class="bi bi-journal-bookmark"></i> Bài viết của tôi</a></li>
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li>
+                                <a class="dropdown-item" href="/taikhoan/chitiet/<%= session.MaNguoiDung %>">
+                                    <i class="bi bi-person-badge me-2"></i>Hồ sơ của tôi
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/baiviet/cuatoi">
+                                    <i class="bi bi-journal-bookmark me-2"></i>Bài viết đã đăng
+                                </a>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/taikhoan/hoso"><i class="bi bi-person-badge"></i> Hồ sơ cá nhân</a></li>
+                            <li>
+                                <a class="dropdown-item" href="/baiviet/them">
+                                    <i class="bi bi-pencil-square me-2"></i>Viết bài mới
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="/dangxuat">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                                </a>
+                            </li>
                         </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/dangxuat"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a>
                     </li>
                 <% } %>
             </ul>
-            <form action="/timkiem" class="d-flex" role="search">
-                <input class="form-control me-2" type="search" name="tukhoa" placeholder="Bạn muốn tìm gì?" />
-                <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i></button>
-            </form>
         </div>
     </div>
 </nav>

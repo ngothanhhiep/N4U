@@ -6,75 +6,158 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
-    <title>
-        <%= title %> - Trang tin điện tử
-    </title>
+    <title><%= title %> - Trang tin điện tử</title>
+    <style>
+        .table td { vertical-align: middle; }
+        /* Tối ưu hiển thị ảnh thumbnail */
+        .img-thumb-list {
+            width: 80px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .img-thumb-list:hover {
+            transform: scale(1.1);
+        }
+        .text-truncate-2 {
+            display: -webkit-box;
+            line-clamp: 2;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            font-weight: 600;
+        }
+    </style>
 </head>
 
-<body>
+<body class="bg-light">
     <div class="container">
-        <!-- Menu ngang -->
         <%- include('navbar') %>
 
-            <!-- Nội dung chính -->
-            <div class="card-body table-responsive">
-                <a href="/baiviet/them" class="btn btn-primary mb-2"><i class="bi bi-plus-lg"></i> Đăng bài viết</a>
-                <table class="table table-bordered table-hover table-sm mb-0">
-                    <thead>
+        <div class="card mt-3 shadow-sm border-0">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold text-primary">
+                    <i class="bi bi-collection-play me-2"></i><%= title %>
+                </h5>
+                <a href="/baiviet/them" class="btn btn-primary btn-sm shadow-sm">
+                    <i class="bi bi-plus-lg"></i> Đăng bài viết
+                </a>
+            </div>
+            
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <th width="5%">#</th>
-                            <th width="15%">Người đăng</th>
-                            <th width="15%">Chủ đề</th>
-                            <th width="40%">Tiêu đề</th>
-                            <th width="10%">Ngày đăng</th>
-                            <th width="5%" title="Tình trạng kiểm duyệt?">D?</th>
-                            <th width="5%">Sửa</th>
-                            <th width="5%">Xóa</th>
+                            <th width="5%" class="text-center">#</th>
+                            <th width="10%">Hình ảnh</th> <th width="15%">Chủ đề</th>
+                            <th width="35%">Tiêu đề bài viết</th>
+                            <th width="15%">Ngày đăng</th>
+                            <th width="10%" class="text-center">Duyệt</th>
+                            <th width="5%" class="text-center">Sửa</th>
+                            <th width="5%" class="text-center">Xóa</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <% var stt=1; %>
+                        <% if(baiviet && baiviet.length > 0) { %>
+                            <% var stt = ((currentPage || 1) - 1) * (pageSize || 20) + 1; %>
                             <% baiviet.forEach(function(bv){ %>
                                 <tr>
-                                    <td class="align-middle"><%= stt++ %></td>
-                                    <td class="align-middle small"><%= bv.ChuDe.TenChuDe %></td>
-                                    <td class="align-middle small"><%= bv.TieuDe %></td>
-                                    <td class="align-middle small"><%= new Date(bv.NgayDang.toISOString()).toLocaleString("vi-VN") %></td>
-                                    <td class="align-middle text-center">
-                                        <% if(bv.KiemDuyet==1) { %>
-                                            <i class="bi bi-check-circle"></i>
-                                            <% } else { %>
-                                                <i class="bi bi-x-circle text-danger"></i>
-                                            <% } %>
-                                    </td>
-                                    <% if(bv.KiemDuyet==1) { %>
-                                        <td class="align-middle text-center"><i
-                                                class="bi bi-pencil-square text-muted"></i></td>
-                                        <td class="align-middle text-center"><i class="bi bi-trash text-muted"></i></td>
+                                    <td class="text-center text-muted"><%= stt++ %></td>
+                                    
+                                    <td>
+                                        <% if(bv.HinhAnh) { %>
+                                            <img src="<%= bv.HinhAnh %>" class="img-thumb-list border shadow-sm" alt="Thumbnail">
                                         <% } else { %>
-                                            <td class="align-middle text-center">
-                                                <a href="/baiviet/sua/<%= bv._id %>"><i
-                                                        class="bi bi-pencil-square"></i></a>
-                                            </td>
-                                            <td class="align-middle text-center">
-                                                <a href="/baiviet/xoa/<%= bv._id %>"
-                                                    onclick="return confirm('Bạn có muốn xóa bài viết <%= bv.TieuDe %> không?');">
-                                                    <i class="bi bi-trash text-danger"></i>
-                                                </a>
-                                            </td>
-                                    <% } %>
+                                            <img src="/images/noimage.png" class="img-thumb-list border shadow-sm" alt="No image">
+                                        <% } %>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-secondary-subtle text-secondary border fw-normal">
+                                            <%= bv.ChuDe ? bv.ChuDe.TenChuDe : 'N/A' %>
+                                        </span>
+                                    </td>
+                                    
+                                    <td>
+                                        <div class="text-truncate-2 text-dark"><%= bv.TieuDe %></div>
+                                    </td>
+                                    
+                                    <td class="small text-muted">
+                                        <i class="bi bi-calendar3 me-1"></i><%= new Date(bv.NgayDang).toLocaleDateString("vi-VN") %>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <% if(bv.KiemDuyet == 1) { %>
+                                            <i class="bi bi-check-circle-fill text-success" title="Đã duyệt"></i>
+                                        <% } else { %>
+                                            <i class="bi bi-clock text-warning" title="Chờ duyệt"></i>
+                                        <% } %>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <% if(bv.KiemDuyet == 1) { %>
+                                            <i class="bi bi-pencil-square text-muted"></i>
+                                        <% } else { %>
+                                            <a href="/baiviet/sua/<%= bv._id %>" class="text-warning">
+                                                <i class="bi bi-pencil-square fs-5"></i>
+                                            </a>
+                                        <% } %>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <% if(bv.KiemDuyet == 1) { %>
+                                            <i class="bi bi-trash text-muted"></i>
+                                        <% } else { %>
+                                            <a href="/baiviet/xoa/<%= bv._id %>" 
+                                               class="text-danger"
+                                               onclick="return confirm('Xác nhận xóa bài viết này?');">
+                                                <i class="bi bi-trash fs-5"></i>
+                                            </a>
+                                        <% } %>
+                                    </td>
                                 </tr>
                             <% }); %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="8" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                    Bạn chưa có bài viết nào.
+                                </td>
+                            </tr>
+                        <% } %>
                     </tbody>
                 </table>
+
+                <div class="d-flex justify-content-between align-items-center p-3 flex-wrap gap-2">
+                    <div class="text-muted small">
+                        Tổng: <%= totalItems || 0 %> bài viết • Trang <%= currentPage || 1 %>/<%= totalPages || 1 %>
+                    </div>
+
+                    <% if ((totalPages || 1) > 1) { %>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item <%= currentPage <= 1 ? 'disabled' : '' %>">
+                                    <a class="page-link" href="?page=<%= currentPage - 1 %>">Trước</a>
+                                </li>
+                                <% for(let i = 1; i <= totalPages; i++) { %>
+                                    <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                                    </li>
+                                <% } %>
+                                <li class="page-item <%= currentPage >= totalPages ? 'disabled' : '' %>">
+                                    <a class="page-link" href="?page=<%= currentPage + 1 %>">Sau</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    <% } %>
+                </div>
             </div>
+        </div>
 
-            <!-- Footer -->
-            <%- include('footer') %>
+        <%- include('footer') %>
     </div>
-
-    <!-- Java Script -->
     <%- include('javascript')%>
 </body>
-
 </html>

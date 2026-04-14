@@ -1,2 +1,106 @@
-<hr class="mb-0">
-<footer>Bản quyền &copy; 2025 bởi Tên của bạn.</footer>
+<style>
+    /* CSS bổ trợ để footer hiển thị đúng cấu trúc chia cột */
+    .footer { background: #f8f9fa; border-top: 1px solid #dee2e6; padding-top: 30px; font-size: 0.9rem; color: #444; }
+    .footer__nav { display: flex; flex-wrap: wrap; justify-content: flex-start; margin-bottom: 30px; }
+    .footer__nav .col { flex: 1; min-width: 150px; display: flex; flex-direction: column; }
+    .footer__nav .item { color: #222; text-decoration: none; margin-bottom: 8px; transition: 0.2s; }
+    .footer__nav .item:hover { color: #007bff; text-decoration: underline; }
+    
+    .footer__middle { border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 20px 0; }
+    .footer__middle-flex { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+    .footer__m-content .list { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 10px; }
+    .footer__m-content .item { color: #666; text-decoration: none; font-size: 0.85rem; }
+    .footer__m-content .social { display: flex; align-items: center; gap: 10px; }
+    .list-sc { display: flex; gap: 10px; }
+
+    .footer__bottom { padding: 30px 0; background: #fff; }
+    .footer__bottom-flex { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 30px; }
+    .footer__contact .value { font-weight: bold; color: #d32f2f; margin-bottom: 10px; }
+    .footer__info .text { margin-bottom: 5px; color: #666; }
+    .copy-right { font-size: 0.8rem; color: #888; line-height: 1.6; }
+    
+    @media (max-width: 768px) {
+        .footer__bottom-flex { grid-template-columns: 1fr; }
+        .footer__nav .col { flex: 1 1 50%; }
+    }
+</style>
+
+<div class="footer" style="display: block; margin-top: 50px;">
+    <div class="footer__top">
+        <div class="container">
+            <div class="footer__nav">
+                <% const footerTopics = (typeof footerChude !== 'undefined' && Array.isArray(footerChude))
+                    ? footerChude
+                    : ((typeof chuyenmuc !== 'undefined' && Array.isArray(chuyenmuc)) ? chuyenmuc : []); %>
+                <% if (footerTopics.length > 0) { 
+                    const itemsPerCol = Math.ceil(footerTopics.length / 5); 
+                    for (let i = 0; i < 5; i++) { %>
+                        <div class="col">
+                            <% footerTopics.slice(i * itemsPerCol, (i + 1) * itemsPerCol).forEach(cd => { %>
+                                <a class="item" href="/chude/<%= cd._id %>"><%= cd.TenChuDe %></a>
+                            <% }) %>
+                        </div>
+                    <% } 
+                } else { %>
+                    <div class="col"><p class="text-muted">Đang cập nhật chuyên mục...</p></div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer__middle">
+        <div class="container">
+            <div class="footer__middle-flex">
+                <a href="/" title="Trang tin điện tử" class="footer__logo">
+                    <img src="https://res.cloudinary.com/dzxouue97/image/upload/v1776106247/N4ULogo-removebg_d5gmdn" width="152px" height="43px" alt="footer__logo" loading="lazy">
+                </a>
+                <div class="footer__m-content">
+                    <div class="social">
+                        <span>Theo dõi trên</span>
+                        <div class="list-sc">
+                            <a href="#" class="item" title="Facebook">
+                                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="0.5" y="0.5" width="31" height="31" rx="15.5" stroke="#8B8B8B"></rect>
+                                    <path d="M16.7922 16.5585H19.7699L20.2374 13.5151H16.7916V11.8518C16.7916 10.5875 17.2022 9.46638 18.3776 9.46638H20.2665V6.81048C19.9346 6.76539 19.2327 6.66669 17.9065 6.66669C15.1371 6.66669 13.5134 8.13813 13.5134 11.4904V13.5151H10.6665V16.5585H13.5134V24.9235C14.0773 25.0088 14.6483 25.0667 15.2346 25.0667C15.7645 25.0667 16.2816 25.0179 16.7922 24.9485V16.5585Z" fill="#8B8B8B"></path>
+                                </svg>
+                            </a>
+                            <a href="#" class="item" title="Youtube">
+                                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect x="0.5" y="0.5" width="31" height="31" rx="15.5" stroke="#8B8B8B"></rect>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M9.0097 21.6455C8.69589 21.5526 8.40956 21.3874 8.17487 21.1639C7.94019 20.9403 7.76403 20.665 7.66126 20.361C7.07404 18.7899 6.90005 12.2295 8.031 10.9345C8.4074 10.5132 8.93882 10.2538 9.50992 10.2126C12.5439 9.89414 21.9177 9.93661 22.9943 10.3188C23.2971 10.4147 23.5737 10.5762 23.8035 10.7913C24.0332 11.0064 24.2101 11.2695 24.3209 11.5608C24.9625 13.1849 24.9843 19.0871 24.2339 20.6476C24.0349 21.0538 23.7017 21.3828 23.2879 21.5818C22.1569 22.1338 10.5104 22.1231 9.0097 21.6455ZM13.8271 18.567L19.2643 15.807L13.8271 13.0257V18.567Z" fill="#8B8B8B"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer__bottom">
+        <div class="container">
+            <div class="footer__bottom-flex">
+                <div class="footer__contact">
+                    <p class="text">Hotline</p>
+                    <p class="value">XXX XXX XXX</p>
+                    <p class="text">Liên hệ quảng cáo</p>
+                    <p class="value">XXX XXX XXX</p>
+                </div>
+                <div class="footer__info">
+                    <p class="text">Tổng biên tập: XXX</p>
+                    <p class="text">Phó tổng biên tập: XXX</p>
+                    <p class="text">Tổng thư ký tòa soạn: XXX</p>
+                    <p class="text">Tác giả: NGÔ THANH HIỆP - thanhhiepngo4@gmail.com</p>
+                </div>
+                <div class="copy-right">
+                    <p>Giấy phép xuất bản số XXX/GP - BTTTT</p>
+                    <p>© 2003-2026 Bản quyền thuộc về XXX. Cấm sao chép dưới mọi hình thức nếu không có sự chấp thuận bằng văn bản.</p>
+
+                    <a href="#" title="Chứng nhận tín nhiệm mạng" target="_blank" style="width: 150px; display: block; margin-top: 15px;">
+                        <img src="https://res.cloudinary.com/dzxouue97/image/upload/v1776106247/N4ULogo-removebg_d5gmdn" width="150" height="68" alt="Tín nhiệm mạng" loading="lazy">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

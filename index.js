@@ -1,17 +1,21 @@
 const express = require('express')
 const app = express()
-const port = 3000;
+const port = 4000;
 
 var indexRouter = require('./routers/index');
 var chudeRouter = require('./routers/chude');
 var taikhoanRouter = require('./routers/taikhoan');
 var baivietRouter = require('./routers/baiviet');
 var authRouter = require('./routers/auth');
+var binhluanRouter = require('./routers/binhluan');
+var quangcaoRouter = require('./routers/quangcao');
+var reportRouter = require('./routers/report');
+var ChuDe = require('./models/chude');
 
 var mongoose = require('mongoose');
 var session = require('express-session');
 var path = require('path');
-var uri = 'mongodb://user:user123456@ac-dfhjs7r-shard-00-01.kyxw2pa.mongodb.net:27017/trangtin?ssl=true&authSource=admin';
+var uri = 'mongodb://user:user123456@ac-dfhjs7r-shard-00-01.kyxw2pa.mongodb.net:27017/NimbleNewNowNetworkForYou?ssl=true&authSource=admin';
 mongoose.connect(uri)
   .then(() => console.log('Đã kết nối thành công tới MongoDB.'))
   .catch(err => console.log(err));
@@ -23,29 +27,33 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(session({
   name: 'iNews', // Tên session (tự chọn)
-  secret: 'Mèo méo meo mèo meo', // Khóa bảo vệ (tự chọn)
+  secret: 'DTH215906Hiep', // Khóa bảo vệ (tự chọn)
   resave: false,
   saveUninitialized: false,
   cookie: {
-    maxAge: 30 * 24 * 60 * 60 * 1000 // Hết hạn sau 30 ngày
+    maxAge: 14 * 24 * 60 * 60 * 1000 // Hết hạn sau 30 ngày
   }
 }));
 app.use((req, res, next) => {
-  // Chuyển biến session thành biến cục bộ
+  // Chuyển biến session thành biến cục bộ cho tất cả view
   res.locals.session = req.session;
+  res.locals.error = req.session.error || null;
+  res.locals.success = req.session.success || null;
 
-  // Lấy thông báo (lỗi, thành công) của trang trước đó (nếu có)
-  var err = req.session.error;
-  var msg = req.session.success;
-
-  // Xóa session sau khi đã truyền qua biến trung gian
+  // Xóa thông báo sau khi đã chuyển sang res.locals
   delete req.session.error;
   delete req.session.success;
 
-  // Gán thông báo (lỗi, thành công) vào biến cục bộ
-  res.locals.message = '';
-  if (err) res.locals.message = '<span class="text-danger">' + err + '</span>';
-  if (msg) res.locals.message = '<span class="text-success">' + msg + '</span>';
+  next();
+});
+
+app.use(async (req, res, next) => {
+  try {
+    res.locals.footerChude = await ChuDe.find().sort({ TenChuDe: 1 });
+  } catch (err) {
+    console.error('Lỗi tải chủ đề cho footer:', err.message);
+    res.locals.footerChude = [];
+  }
 
   next();
 });
@@ -55,6 +63,9 @@ app.use('/', indexRouter);
 app.use('/chude', chudeRouter);
 app.use('/taikhoan', taikhoanRouter);
 app.use('/baiviet', baivietRouter);
+app.use('/binhluan', binhluanRouter);
+app.use('/quangcao', quangcaoRouter);
+app.use('/report', reportRouter);
 app.use('/', authRouter);
 app.use('/', express.static(path.join(__dirname, 'public')));
 
