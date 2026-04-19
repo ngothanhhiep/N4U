@@ -7,6 +7,10 @@ const cloudinary = require('../configs/cloudinary');
 
 const PAGE_SIZE = 20;
 
+// =========================
+// MIDDLEWARE DÙNG CHUNG
+// =========================
+
 const checkAdminOrManager = (req, res, next) => {
     if (!req.session.MaNguoiDung) {
         req.session.error = 'Bạn cần đăng nhập.';
@@ -29,7 +33,11 @@ router.param('id', (req, res, next, id) => {
     next();
 });
 
-// GET: Danh sách quảng cáo (có phân trang)
+// =========================
+// ROUTE QUẢN LÝ QUẢNG CÁO
+// =========================
+
+// [GET] /quangcao - Danh sách quảng cáo
 router.get('/', checkAdminOrManager, async (req, res) => {
     try {
         const currentPage = Math.max(1, parseInt(req.query.page) || 1);
@@ -56,14 +64,14 @@ router.get('/', checkAdminOrManager, async (req, res) => {
     }
 });
 
-// GET: Form thêm quảng cáo
+// [GET] /quangcao/them - Trang thêm quảng cáo
 router.get('/them', checkAdminOrManager, async (req, res) => {
     res.render('quangcao_them', {
         title: 'Thêm quảng cáo'
     });
 });
 
-// POST: Thêm quảng cáo
+// [POST] /quangcao/them - Tạo quảng cáo mới
 router.post('/them', checkAdminOrManager, upload.single('HinhAnhFile'), async (req, res) => {
     try {
         const hinhAnhLink = (req.body.HinhAnh || '').trim();
@@ -98,7 +106,7 @@ router.post('/them', checkAdminOrManager, upload.single('HinhAnhFile'), async (r
     }
 });
 
-// GET: Form sửa quảng cáo
+// [GET] /quangcao/sua/:id - Trang sửa quảng cáo
 router.get('/sua/:id', checkAdminOrManager, async (req, res) => {
     try {
         const qc = await QuangCao.findById(req.params.id);
@@ -117,7 +125,7 @@ router.get('/sua/:id', checkAdminOrManager, async (req, res) => {
     }
 });
 
-// POST: Sửa quảng cáo
+// [POST] /quangcao/sua/:id - Cập nhật quảng cáo
 router.post('/sua/:id', checkAdminOrManager, upload.single('HinhAnhFile'), async (req, res) => {
     try {
         const qcCu = await QuangCao.findById(req.params.id);
@@ -187,7 +195,7 @@ router.post('/sua/:id', checkAdminOrManager, upload.single('HinhAnhFile'), async
     }
 });
 
-// GET: Xóa quảng cáo
+// [GET] /quangcao/xoa/:id - Xóa quảng cáo
 router.get('/xoa/:id', checkAdminOrManager, async (req, res) => {
     try {
         const qc = await QuangCao.findByIdAndDelete(req.params.id);

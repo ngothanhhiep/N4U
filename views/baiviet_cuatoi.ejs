@@ -67,11 +67,7 @@
                                     <td class="text-center text-muted"><%= stt++ %></td>
                                     
                                     <td>
-                                        <% if(bv.HinhAnh) { %>
-                                            <img src="<%= bv.HinhAnh %>" class="img-thumb-list border shadow-sm" alt="Thumbnail">
-                                        <% } else { %>
-                                            <img src="/images/noimage.png" class="img-thumb-list border shadow-sm" alt="No image">
-                                        <% } %>
+                                        <img src="<%= bv.displayImage || bv.HinhAnh || '/images/noimage.png' %>" class="img-thumb-list border shadow-sm" alt="Thumbnail" onerror="this.src='/images/noimage.png'">
                                     </td>
 
                                     <td>

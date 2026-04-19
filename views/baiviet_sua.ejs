@@ -51,6 +51,13 @@
                                 required><%= baiviet.TomTat %></textarea>
                         </div>
                         <div class="mb-3">
+                            <label for="VideoURL" class="form-label">Link video (tùy chọn)</label>
+                            <input type="url" class="form-control" id="VideoURL" name="VideoURL"
+                                value="<%= baiviet.VideoURL || '' %>"
+                                placeholder="Ví dụ: https://www.youtube.com/watch?v=... hoặc link .mp4" />
+                            <div class="form-text">Có thể để trống nếu bài viết không có video.</div>
+                        </div>
+                        <div class="mb-3">
                             <label for="NoiDung" class="form-label">Nội dung bài viết</label>
                             <textarea class="form-control" id="NoiDung" name="NoiDung"
                                 required><%= baiviet.NoiDung %></textarea>
@@ -63,10 +70,10 @@
                                     class="img-thumbnail" style="max-width: 280px; max-height: 180px; object-fit: cover;">
                             </div>
                             <input type="url" class="form-control mb-2" id="HinhAnhLink" name="HinhAnhLink"
-                                value="<%= baiviet.HinhAnh || '' %>" placeholder="Dán link ảnh mới (tùy chọn)" />
+                                value="" placeholder="Dán link ảnh mới (tùy chọn)" />
                             <input type="file" class="form-control" id="HinhAnh" name="HinhAnh" accept="image/*"
                                 onchange="previewImage(event)" />
-                            <div class="form-text">Bạn có thể sửa bằng link hoặc upload file. Nếu chọn file, hệ thống ưu tiên file.</div>
+                            <div class="form-text">Để trống cả link và file thì hệ thống sẽ tự lấy ảnh đầu tiên trong nội dung bài viết.</div>
                         </div>
 
                         <button type="submit" class="btn btn-primary"><i class="bi bi-cloud-arrow-up"></i> Cập nhật bài

@@ -5,6 +5,10 @@ var BaiViet = require('../models/baiviet');
 var firstImageFunc = require('../modules/firstimage');
 var mongoose = require('mongoose');
 
+// =========================
+// MIDDLEWARE DÙNG CHUNG
+// =========================
+
 // Middleware kiểm tra quyền truy cập (Nếu cần)
 const checkAuth = (req, res, next) => {
     if (!req.session.MaNguoiDung) {
@@ -23,7 +27,11 @@ router.param('id', (req, res, next, id) => {
     next();
 });
 
-// 1. Route danh sách (Thêm sắp xếp A-Z)
+// =========================
+// ROUTE QUẢN LÝ CHỦ ĐỀ
+// =========================
+
+// [GET] /chude - Danh sách chủ đề
 router.get('/', async (req, res) => {
     try {
         // .sort({ TenChuDe: 1 }) giúp danh sách ngăn nắp hơn
@@ -35,7 +43,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// 2. Route THÊM
+// [GET] /chude/them - Trang thêm chủ đề
 router.get('/them', checkAuth, async (req, res) => {
     try {
         res.render('chude_them', { title: 'Thêm chủ đề' });
@@ -46,6 +54,7 @@ router.get('/them', checkAuth, async (req, res) => {
     }
 });
 
+// [POST] /chude/them - Tạo chủ đề mới
 router.post('/them', checkAuth, async (req, res) => {
     try {
         await ChuDe.create({ TenChuDe: req.body.TenChuDe });
@@ -58,7 +67,7 @@ router.post('/them', checkAuth, async (req, res) => {
     }
 });
 
-// 3. Các route SỬA
+// [GET] /chude/sua/:id - Trang sửa chủ đề
 router.get('/sua/:id', checkAuth, async (req, res) => {
     try {
         var chude = await ChuDe.findById(req.params.id);
@@ -72,6 +81,7 @@ router.get('/sua/:id', checkAuth, async (req, res) => {
     }
 });
 
+// [POST] /chude/sua/:id - Cập nhật chủ đề
 router.post('/sua/:id', checkAuth, async (req, res) => {
     try {
         await ChuDe.findByIdAndUpdate(req.params.id, { TenChuDe: req.body.TenChuDe });
@@ -83,7 +93,7 @@ router.post('/sua/:id', checkAuth, async (req, res) => {
     }
 });
 
-// 4. Route XÓA
+// [GET] /chude/xoa/:id - Xóa chủ đề
 router.get('/xoa/:id', checkAuth, async (req, res) => {
     try {
         await ChuDe.findByIdAndDelete(req.params.id);
@@ -95,8 +105,11 @@ router.get('/xoa/:id', checkAuth, async (req, res) => {
     }
 });
 
-// 5. Route xem bài viết theo chủ đề (public)
-// Thống nhất URL public theo chuẩn /chude/:id
+// =========================
+// ROUTE PUBLIC
+// =========================
+
+// [GET] /chude/:id - Xem bài viết theo chủ đề
 router.get('/:id', async (req, res) => {
     try {
         const id = req.params.id;

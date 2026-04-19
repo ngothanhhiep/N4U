@@ -22,10 +22,18 @@ const mapArticleCardData = (article) => {
     };
 };
 
-// Route upload ảnh (nếu dùng)
+// =========================
+// ROUTE HỖ TRỢ
+// =========================
+
+// [POST] /uploads - Upload ảnh cho editor
 router.post('/uploads', upload.single('HinhAnh'), imageController.uploadImages);
 
-// GET: Trang chủ
+// =========================
+// ROUTE PUBLIC
+// =========================
+
+// [GET] / - Trang chủ
 router.get('/', async (req, res) => {
     try {
         const [cm, bv, xnn, randomAd] = await Promise.all([
@@ -98,10 +106,10 @@ const renderCategoryPage = async (req, res) => {
     }
 };
 
-// GET: Tin mới nhất (có phân trang)
+// [GET] /tinmoi - Danh sách bài viết mới nhất
 router.get('/tinmoi', async (req, res) => {
     try {
-        const PAGE_SIZE = 20;
+        const PAGE_SIZE = 10;
         const currentPage = Math.max(1, parseInt(req.query.page) || 1);
         const totalItems = await BaiViet.countDocuments({ KiemDuyet: 1 });
         const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
@@ -137,7 +145,7 @@ router.get('/tinmoi', async (req, res) => {
     }
 });
 
-// GET: Tìm kiếm bài viết
+// [GET] /timkiem - Tìm kiếm bài viết
 router.get('/timkiem', async (req, res) => {
     try {
         const tukhoa = (req.query.tukhoa || '').trim().substring(0, 200);
@@ -161,7 +169,7 @@ router.get('/timkiem', async (req, res) => {
             });
         }
 
-        const PAGE_SIZE = 20;
+        const PAGE_SIZE = 10;
         const currentPage = Math.max(1, parseInt(req.query.page) || 1);
 
         // Escape ký tự đặc biệt của regex để tránh ReDoS
@@ -267,7 +275,7 @@ router.get('/timkiem', async (req, res) => {
     }
 });
 
-// GET: URL cũ, giữ tương thích và chuyển về URL chuẩn /chude/:id
+// [GET] /chuyenmuc/:id - URL cũ, chuyển hướng về /chude/:id
 router.get('/chuyenmuc/:id', (req, res) => {
     return res.redirect('/chude/' + req.params.id);
 });

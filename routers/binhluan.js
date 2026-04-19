@@ -3,6 +3,10 @@ var router = express.Router();
 var BinhLuan = require('../models/binhluan');
 const PAGE_SIZE = 20;
 
+// =========================
+// MIDDLEWARE DÙNG CHUNG
+// =========================
+
 // Middleware kiểm tra đăng nhập
 const isLoggedIn = (req, res, next) => {
     if (req.session.MaNguoiDung) {
@@ -26,7 +30,11 @@ const canManage = (req, res, next) => {
     next();
 };
 
-// 1. GET: Danh sách bình luận
+// =========================
+// ROUTE QUẢN LÝ BÌNH LUẬN
+// =========================
+
+// [GET] /binhluan - Danh sách bình luận
 router.get('/', canManage, async (req, res) => {
     try {
         const currentPage = Math.max(1, parseInt(req.query.page) || 1);
@@ -55,7 +63,11 @@ router.get('/', canManage, async (req, res) => {
     }
 });
 
-// 2. POST: Gửi bình luận mới
+// =========================
+// ROUTE TƯƠNG TÁC BÌNH LUẬN
+// =========================
+
+// [POST] /binhluan/them - Gửi bình luận mới
 router.post('/them', isLoggedIn, async (req, res) => {
     try {
         const { BaiViet, NoiDung } = req.body;
@@ -79,7 +91,7 @@ router.post('/them', isLoggedIn, async (req, res) => {
     }
 });
 
-// 2. GET: Xóa bình luận
+// [GET] /binhluan/xoa/:id - Xóa bình luận
 router.get('/xoa/:id', isLoggedIn, async (req, res) => {
     try {
         const bl = await BinhLuan.findById(req.params.id);
@@ -99,7 +111,7 @@ router.get('/xoa/:id', isLoggedIn, async (req, res) => {
     }
 });
 
-// 3. GET: Like bình luận (Có tính năng hủy)
+// [GET] /binhluan/like/:id - Like/hủy like bình luận
 router.get('/like/:id', isLoggedIn, async (req, res) => {
     try {
         const userId = req.session.MaNguoiDung;
@@ -132,7 +144,7 @@ router.get('/like/:id', isLoggedIn, async (req, res) => {
     }
 });
 
-// 4. GET: Dislike bình luận (Có tính năng hủy)
+// [GET] /binhluan/dislike/:id - Dislike/hủy dislike bình luận
 router.get('/dislike/:id', isLoggedIn, async (req, res) => {
     try {
         const userId = req.session.MaNguoiDung;

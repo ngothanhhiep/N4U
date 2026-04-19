@@ -6,6 +6,7 @@ const baiVietSchema = new mongoose.Schema({
     TieuDe: { type: String, required: true },
     TomTat: { type: String, required: true },
     NoiDung: { type: String, required: true },
+    VideoURL: { type: String, default: '' },
     
     // --- Thêm phần quản lý ảnh đại diện bài viết ---
     HinhAnh: { 
