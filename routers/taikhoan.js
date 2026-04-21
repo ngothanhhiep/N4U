@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var TaiKhoan = require('../models/taikhoan');
 var BaiViet = require('../models/baiviet'); // Thêm model Bài Viết
+var Video = require('../models/video');
 var BinhLuan = require('../models/binhluan'); // Thêm model Bình Luận
 var bcrypt = require('bcryptjs'); // Đảm bảo đã require bcrypt
 var upload = require('../modules/upload'); // Module cấu hình Cloudinary
@@ -171,8 +172,11 @@ router.get(['/chitiet', '/chitiet/:id'], async (req, res) => {
             return res.redirect('/');
         }
 
-        // 2. Lấy danh sách bài viết của người này
+        // 2. Lấy danh sách bài viết và video của người này
         const danhSachBaiViet = await BaiViet.find({ TaiKhoan: id }).sort({ NgayDang: -1 });
+        const danhSachVideo = await Video.find({ TaiKhoan: id })
+            .sort({ createdAt: -1 })
+            .populate('BaiViet', 'TieuDe');
 
         // 3. Tính toán thống kê
         let tongLuotXem = 0;
@@ -203,9 +207,11 @@ router.get(['/chitiet', '/chitiet/:id'], async (req, res) => {
             title: 'Hồ sơ cá nhân',
             taikhoan: user,
             baiviet: baiVietThongKe,
+            video: danhSachVideo,
             thongke: {
                 tongLuotXem: tongLuotXem,
                 soBaiViet: danhSachBaiViet.length,
+                soVideo: danhSachVideo.length,
                 tongBinhLuan: tongSoBinhLuanDaViet
             },
             session: req.session

@@ -80,19 +80,25 @@
 
             <div class="col-lg-8">
                 <div class="row g-3 mb-4">
-                    <div class="col-4">
+                    <div class="col-3">
                         <div class="card stat-card shadow-sm bg-white p-3 text-center">
                             <h4 class="fw-bold text-primary mb-0"><%= thongke.soBaiViet %></h4>
                             <small class="text-muted">Bài viết</small>
                         </div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-3">
+                        <div class="card stat-card shadow-sm bg-white p-3 text-center">
+                            <h4 class="fw-bold text-danger mb-0"><%= thongke.soVideo || 0 %></h4>
+                            <small class="text-muted">Video</small>
+                        </div>
+                    </div>
+                    <div class="col-3">
                         <div class="card stat-card shadow-sm bg-white p-3 text-center">
                             <h4 class="fw-bold text-success mb-0"><%= thongke.tongLuotXem %></h4>
                             <small class="text-muted">Lượt xem</small>
                         </div>
                     </div>
-                    <div class="col-4">
+                    <div class="col-3">
                         <div class="card stat-card shadow-sm bg-white p-3 text-center">
                             <h4 class="fw-bold text-info mb-0"><%= thongke.tongBinhLuan %></h4>
                             <small class="text-muted">Bình luận</small>
@@ -107,6 +113,12 @@
                                 <a class="nav-link active" id="articles-tab" data-bs-toggle="tab" href="#articles" role="tab">
                                     <i class="bi bi-journal-text me-1"></i> 
                                     <%= (session && session.MaNguoiDung == taikhoan._id) ? 'Bài viết của tôi' : 'Bài viết của ' + taikhoan.HoVaTen %>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="videos-tab" data-bs-toggle="tab" href="#videos" role="tab">
+                                    <i class="bi bi-collection-play me-1"></i>
+                                    <%= (session && session.MaNguoiDung == taikhoan._id) ? 'Video của tôi' : 'Video của ' + taikhoan.HoVaTen %>
                                 </a>
                             </li>
                         </ul>
@@ -144,6 +156,44 @@
                                         <div class="p-5 text-center text-muted">
                                             <i class="bi bi-inbox fs-1 d-block mb-2"></i>
                                             Chưa có bài viết nào được đăng.
+                                        </div>
+                                    <% } %>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane fade" id="videos" role="tabpanel" aria-labelledby="videos-tab">
+                                <div class="list-group list-group-flush">
+                                    <% if(video && video.length > 0) { %>
+                                        <% video.forEach(v => { %>
+                                            <div class="list-group-item article-item p-3">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <h6 class="mb-1">
+                                                            <a href="/video/xem/<%= v._id %>" class="text-decoration-none text-dark fw-bold">
+                                                                <%= v.TenVideo %>
+                                                            </a>
+                                                        </h6>
+                                                        <small class="text-muted d-block">
+                                                            <i class="bi bi-clock me-1"></i><%= new Date(v.createdAt).toLocaleDateString('vi-VN') %>
+                                                        </small>
+                                                        <% if (v.BaiViet) { %>
+                                                            <small class="text-muted d-block">
+                                                                <i class="bi bi-link-45deg me-1"></i>Bài viết: <%= v.BaiViet.TieuDe %>
+                                                            </small>
+                                                        <% } %>
+                                                    </div>
+                                                    <div class="text-end">
+                                                        <span class="badge bg-light text-dark border">
+                                                            <i class="bi bi-camera-reels me-1"></i><%= v.DinhDang || 'video' %>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <div class="p-5 text-center text-muted">
+                                            <i class="bi bi-camera-video-off fs-1 d-block mb-2"></i>
+                                            Chưa có video nào được đăng.
                                         </div>
                                     <% } %>
                                 </div>

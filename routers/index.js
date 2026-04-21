@@ -9,6 +9,7 @@ var mongoose = require('mongoose');
 // Cấu hình upload
 var upload = require('../modules/upload'); 
 var imageController = require('../controllers/images'); 
+var uploadVideo = upload.uploadVideo;
 
 const mapArticleCardData = (article) => {
     const articleObj = article.toObject();
@@ -28,6 +29,9 @@ const mapArticleCardData = (article) => {
 
 // [POST] /uploads - Upload ảnh cho editor
 router.post('/uploads', upload.single('HinhAnh'), imageController.uploadImages);
+
+// [POST] /uploads/video - Upload video lên Cloudinary
+router.post('/uploads/video', uploadVideo.single('Video'), imageController.uploadVideos);
 
 // =========================
 // ROUTE PUBLIC

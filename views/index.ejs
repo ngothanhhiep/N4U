@@ -329,8 +329,8 @@
                 const minTop = containerTop;
                 const maxTop = Math.min(containerTop + containerHeight, footerTop - viewportGap) - sidebarHeight;
 
-                // Nếu sidebar cao hơn vùng hiển thị thì fallback bám top để dễ sử dụng.
-                const desiredTop = (isScrollingDown && sidebarHeight < (window.innerHeight - headerOffset))
+                // Cuộn xuống thì ưu tiên bám đáy màn hình; cuộn lên thì bám gần header.
+                const desiredTop = isScrollingDown
                     ? currentScrollY + window.innerHeight - sidebarHeight - viewportGap
                     : currentScrollY + headerOffset;
 

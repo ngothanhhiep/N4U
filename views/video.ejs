@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <title><%= title %> - Quản trị</title>
+</head>
+
+<body>
+    <div class="container">
+        <%- include('navbar') %>
+
+        <div class="card mt-3">
+            <div class="card-header fw-bold text-uppercase">
+                <i class="bi bi-film"></i> <%= title %>
+            </div>
+            <div class="card-body table-responsive">
+                <a href="/video/them" class="btn btn-primary mb-3">
+                    <i class="bi bi-camera-video"></i> Thêm video mới
+                </a>
+
+                <table class="table table-bordered table-hover table-sm mb-0">
+                    <thead class="table-light text-center">
+                        <tr>
+                            <th width="5%">#</th>
+                            <th width="25%">Tên video</th>
+                            <th width="15%">Người đăng</th>
+                            <th width="20%">Bài viết liên quan</th>
+                            <th width="10%">Dung lượng</th>
+                            <th width="10%">Thời lượng</th>
+                            <th width="5%">Xem</th>
+                            <th width="5%">Sửa</th>
+                            <th width="5%">Xóa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% var stt = ((currentPage || 1) - 1) * (pageSize || 10) + 1; %>
+                        <% video.forEach(item => { %>
+                            <tr>
+                                <td class="align-middle text-center"><%= stt++ %></td>
+                                <td class="align-middle">
+                                    <div class="fw-bold"><%= item.TenVideo %></div>
+                                    <small class="text-muted"><%= item.DinhDang || 'video' %></small>
+                                </td>
+                                <td class="align-middle small">
+                                    <%= item.TaiKhoan ? (item.TaiKhoan.HoVaTen || item.TaiKhoan.TenDangNhap || item.TaiKhoan.Email) : 'N/A' %>
+                                </td>
+                                <td class="align-middle small">
+                                    <%= item.BaiViet ? item.BaiViet.TieuDe : 'Chưa gắn bài viết' %>
+                                </td>
+                                <td class="align-middle text-center small">
+                                    <% if (item.KichThuoc >= 1024 * 1024) { %>
+                                        <%= (item.KichThuoc / (1024 * 1024)).toFixed(2) %> MB
+                                    <% } else { %>
+                                        <%= (item.KichThuoc / 1024).toFixed(0) %> KB
+                                    <% } %>
+                                </td>
+                                <td class="align-middle text-center small"><%= Number(item.ThoiLuong || 0).toFixed(1) %>s</td>
+                                <td class="align-middle text-center">
+                                    <a href="/video/xem/<%= item._id %>" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-play-circle"></i>
+                                    </a>
+                                </td>
+                                <td class="align-middle text-center">
+                                    <a href="/video/sua/<%= item._id %>" class="btn btn-sm btn-outline-warning">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                </td>
+                                <td class="align-middle text-center">
+                                    <a href="/video/xoa/<%= item._id %>" class="btn btn-sm btn-outline-danger"
+                                        onclick="return confirm('Bạn có thực sự muốn xóa video: <%= item.TenVideo %>?');">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        <% }); %>
+
+                        <% if(video.length == 0) { %>
+                            <tr>
+                                <td colspan="9" class="text-center text-muted">Không có video nào.</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+
+                <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+                    <div class="text-muted small">
+                        Tổng: <%= totalItems || 0 %> video • Trang <%= currentPage || 1 %>/<%= totalPages || 1 %>
+                    </div>
+
+                    <% if ((totalPages || 1) > 1) { %>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item <%= currentPage <= 1 ? 'disabled' : '' %>">
+                                    <a class="page-link" href="?page=<%= currentPage - 1 %>">Trước</a>
+                                </li>
+                                <% for(let i = 1; i <= totalPages; i++) { %>
+                                    <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                                    </li>
+                                <% } %>
+                                <li class="page-item <%= currentPage >= totalPages ? 'disabled' : '' %>">
+                                    <a class="page-link" href="?page=<%= currentPage + 1 %>">Sau</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <%- include('footer') %>
+    </div>
+
+    <%- include('javascript')%>
+</body>
+
+</html>

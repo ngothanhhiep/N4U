@@ -10,6 +10,7 @@ var authRouter = require('./routers/auth');
 var binhluanRouter = require('./routers/binhluan');
 var quangcaoRouter = require('./routers/quangcao');
 var reportRouter = require('./routers/report');
+var videoRouter = require('./routers/video');
 var ChuDe = require('./models/chude');
 
 var mongoose = require('mongoose');
@@ -66,6 +67,7 @@ app.use('/baiviet', baivietRouter);
 app.use('/binhluan', binhluanRouter);
 app.use('/quangcao', quangcaoRouter);
 app.use('/report', reportRouter);
+app.use('/video', videoRouter);
 app.use('/', authRouter);
 app.use('/', express.static(path.join(__dirname, 'public')));
 

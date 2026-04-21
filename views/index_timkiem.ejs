@@ -350,7 +350,7 @@
                 const minTop = containerTop;
                 const maxTop = Math.min(containerTop + containerHeight, footerTop - viewportGap) - sidebarHeight;
 
-                const desiredTop = (isScrollingDown && sidebarHeight < (window.innerHeight - headerOffset))
+                const desiredTop = isScrollingDown
                     ? currentScrollY + window.innerHeight - sidebarHeight - viewportGap
                     : currentScrollY + headerOffset;
 

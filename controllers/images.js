@@ -23,5 +23,29 @@ const uploadImages = async (req, res) => {
     }
 };
 
+const uploadVideos = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'Không có file video nào được chọn!' });
+        }
+
+        res.status(200).json({
+            message: 'Upload video thành công!',
+            url: req.file.path,
+            public_id: req.file.filename,
+            resource_type: req.file.resource_type || 'video',
+            format: req.file.format || '',
+            bytes: req.file.bytes || 0,
+            duration: req.file.duration || 0
+        });
+    } catch (error) {
+        console.error('Lỗi upload video:', error);
+        res.status(500).json({
+            message: 'Lỗi server khi upload video',
+            error: error.message
+        });
+    }
+};
+
 // Thay 'export' bằng 'module.exports'
-module.exports = { uploadImages };
+module.exports = { uploadImages, uploadVideos };
