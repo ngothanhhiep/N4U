@@ -7,6 +7,7 @@ var BinhLuan = require('../models/binhluan'); // Thêm model Bình Luận
 var bcrypt = require('bcryptjs'); // Đảm bảo đã require bcrypt
 var upload = require('../modules/upload'); // Module cấu hình Cloudinary
 const cloudinary = require('../configs/cloudinary'); // Để dùng lệnh xóa ảnh
+var firstImageFunc = require('../modules/firstimage');
 const PAGE_SIZE = 20;
 var mongoose = require('mongoose');
 const ALLOWED_ROLES = ['user', 'admin', 'maneger'];
@@ -188,15 +189,13 @@ router.get(['/chitiet', '/chitiet/:id'], async (req, res) => {
         const baiVietThongKe = await Promise.all(danhSachBaiViet.map(async (bv) => {
             tongLuotXem += bv.LuotXem;
             
-            // Đếm số bình luận của bài viết này
             const soBinhLuan = await BinhLuan.countDocuments({ BaiViet: bv._id });
-            
-            // Giả sử lượt thich/không thích nằm trong bài viết (nếu bạn thiết kế như vậy)
-            // Hoặc tính từ mảng trong bình luận. 
-            // Ở đây tôi lấy tổng số bình luận mà người này đã viết:
+
+            const uploadedImage = bv.HinhAnh && bv.HinhAnh !== '/images/noimage.png' ? bv.HinhAnh : null;
             return {
                 ...bv._doc,
-                SoBinhLuan: soBinhLuan
+                SoBinhLuan: soBinhLuan,
+                displayImage: uploadedImage || firstImageFunc(bv.NoiDung)
             };
         }));
 

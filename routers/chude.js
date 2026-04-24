@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var ChuDe = require('../models/chude');
 var BaiViet = require('../models/baiviet');
+var QuangCao = require('../models/quangcao');
 var firstImageFunc = require('../modules/firstimage');
 var mongoose = require('mongoose');
 
@@ -114,12 +115,14 @@ router.get('/:id', async (req, res) => {
     try {
         const id = req.params.id;
 
-        const [cm, cd, xnn] = await Promise.all([
+        const [cm, cd, xnn, randomAd] = await Promise.all([
             ChuDe.find(),
             ChuDe.findById(id),
             BaiViet.find({ KiemDuyet: 1 })
                 .sort({ LuotXem: -1 })
-                .limit(3)
+                .limit(5),
+            QuangCao.aggregate([{ $sample: { size: 1 } }])
+                .then(items => (items && items.length > 0 ? items[0] : null))
         ]);
 
         if (!cd) {
@@ -149,7 +152,8 @@ router.get('/:id', async (req, res) => {
             chuyenmuc: cm,
             chude: cd,
             baiviet: baivietWithImage,
-            xemnhieu: xnn
+            xemnhieu: xnn,
+            quangcao: randomAd
         });
     } catch (err) {
         console.error('Lỗi lấy bài viết theo chủ đề:', err);

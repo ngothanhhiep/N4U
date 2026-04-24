@@ -81,10 +81,12 @@ const renderCategoryPage = async (req, res) => {
             return res.status(400).send('ID chủ đề không hợp lệ.');
         }
 
-        const [cm, cd, xnn] = await Promise.all([
+        const [cm, cd, xnn, randomAd] = await Promise.all([
             ChuDe.find(),
             ChuDe.findById(id),
-            BaiViet.find({ KiemDuyet: 1 }).sort({ LuotXem: -1 }).limit(3)
+            BaiViet.find({ KiemDuyet: 1 }).sort({ LuotXem: -1 }).limit(5),
+            QuangCao.aggregate([{ $sample: { size: 1 } }])
+                .then(items => (items && items.length > 0 ? items[0] : null))
         ]);
 
         if (!cd) return res.status(404).send('Chủ đề không tồn tại.');
@@ -102,7 +104,8 @@ const renderCategoryPage = async (req, res) => {
             chuyenmuc: cm,
             chude: cd,
             baiviet: baivietWithImage,
-            xemnhieu: xnn
+            xemnhieu: xnn,
+            quangcao: randomAd
         });
     } catch (error) {
         console.error("Lỗi lấy bài viết theo chủ đề:", error);
@@ -119,7 +122,7 @@ router.get('/tinmoi', async (req, res) => {
         const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
         const page = Math.min(currentPage, totalPages);
 
-        const [cm, bv, xnn] = await Promise.all([
+        const [cm, bv, xnn, randomAd] = await Promise.all([
             ChuDe.find(),
             BaiViet.find({ KiemDuyet: 1 })
                 .sort({ NgayDang: -1 })
@@ -129,7 +132,9 @@ router.get('/tinmoi', async (req, res) => {
                 .limit(PAGE_SIZE),
             BaiViet.find({ KiemDuyet: 1 })
                 .sort({ LuotXem: -1 })
-                .limit(5)
+                .limit(5),
+            QuangCao.aggregate([{ $sample: { size: 1 } }])
+                .then(items => (items && items.length > 0 ? items[0] : null))
         ]);
 
         const baivietWithImage = bv.map(mapArticleCardData);
@@ -139,6 +144,7 @@ router.get('/tinmoi', async (req, res) => {
             chuyenmuc: cm,
             baiviet: baivietWithImage,
             xemnhieu: xnn,
+            quangcao: randomAd,
             currentPage: page,
             totalPages: totalPages,
             totalItems: totalItems
