@@ -48,6 +48,16 @@ const normalizeVideoUrl = (rawUrl) => {
     return value;
 };
 
+const resolveArticleCoverImage = (imageValue, content) => {
+    const normalizedImage = typeof imageValue === 'string' ? imageValue.trim() : imageValue;
+
+    if (normalizedImage && normalizedImage !== '/images/noimage.png') {
+        return normalizedImage;
+    }
+
+    return firstImageFunc(content || '');
+};
+
 // =========================
 // MIDDLEWARE DÙNG CHUNG
 // =========================
@@ -107,9 +117,7 @@ router.get('/', canManage, async (req, res) => {
             const obj = item.toObject();
             return {
                 ...obj,
-                displayImage: obj.HinhAnh && obj.HinhAnh !== '/images/noimage.png'
-                    ? obj.HinhAnh
-                    : firstImageFunc(obj.NoiDung)
+                displayImage: resolveArticleCoverImage(obj.HinhAnh, obj.NoiDung)
             };
         });
 
@@ -146,9 +154,7 @@ router.get('/cuatoi', isLoggedIn, async (req, res) => {
             const obj = item.toObject();
             return {
                 ...obj,
-                displayImage: obj.HinhAnh && obj.HinhAnh !== '/images/noimage.png'
-                    ? obj.HinhAnh
-                    : firstImageFunc(obj.NoiDung)
+                displayImage: resolveArticleCoverImage(obj.HinhAnh, obj.NoiDung)
             };
         });
 
@@ -240,30 +246,22 @@ router.post('/sua/:id', isLoggedIn, upload.single('HinhAnh'), async (req, res) =
             KiemDuyet: 0 
         };
 
-        // Ưu tiên file mới nếu có upload
+        const autoCoverImage = firstImageFunc(noiDungMoi);
+
+        // Ưu tiên file mới, nếu không có thì ưu tiên link nhập tay, cuối cùng mới lấy ảnh đầu tiên trong nội dung.
         if (req.file) {
-            // XÓA ẢNH CŨ NẾU CÓ
             if (bv_cu && bv_cu.CloudinaryId) {
                 await cloudinary.uploader.destroy(bv_cu.CloudinaryId);
             }
-            // Cập nhật thông tin ảnh mới
+
             data.HinhAnh = req.file.path;
             data.CloudinaryId = req.file.filename;
-        } else if (hinhAnhLink && hinhAnhLink !== (bv_cu.HinhAnh || '')) {
-            // Đổi sang link mới: nếu ảnh cũ nằm trên Cloudinary thì dọn ảnh cũ
+        } else {
             if (bv_cu.CloudinaryId) {
                 await cloudinary.uploader.destroy(bv_cu.CloudinaryId);
             }
-            data.HinhAnh = hinhAnhLink;
-            data.CloudinaryId = null;
-        } else if (!hinhAnhLink && bv_cu.CloudinaryId) {
-            // Không còn link và không upload file -> lấy ảnh đầu tiên trong nội dung
-            await cloudinary.uploader.destroy(bv_cu.CloudinaryId);
-            data.HinhAnh = firstImageFunc(noiDungMoi);
-            data.CloudinaryId = null;
-        } else if (!hinhAnhLink && !bv_cu.CloudinaryId) {
-            // Trường hợp ảnh cũ là link và người dùng xóa link -> lấy ảnh đầu trong nội dung
-            data.HinhAnh = firstImageFunc(noiDungMoi);
+
+            data.HinhAnh = resolveArticleCoverImage(hinhAnhLink || autoCoverImage, noiDungMoi);
             data.CloudinaryId = null;
         }
 

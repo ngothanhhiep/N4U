@@ -36,6 +36,29 @@
             height: 100%;
             border: 0;
         }
+
+        /* Ảnh và media trong nội dung bài viết tự co vừa cột, không lố sang sidebar */
+        .article-content img,
+        .article-content video,
+        .article-content iframe,
+        .article-content embed,
+        .article-content object {
+            max-width: 100% !important;
+            width: auto !important;
+            height: auto !important;
+        }
+
+        .article-content figure {
+            max-width: 100% !important;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .article-content table {
+            max-width: 100%;
+            overflow-x: auto;
+            display: block;
+        }
     </style>
 </head>
 
