@@ -93,9 +93,9 @@
                                     <i class="bi bi-eye"></i> Lượt xem: <%= baiviet.LuotXem %>
                                 </p>
                                 <hr>
-                                <% if(baiviet.HinhAnh) { %>
+                                <% if(baiviet.displayImage || baiviet.HinhAnh) { %>
                                     <div class="text-center mb-4">
-                                        <img src="<%= baiviet.HinhAnh %>" class="img-fluid rounded shadow-sm" style="max-height: 400px; width: 100%; object-fit: cover;">
+                                        <img src="<%- baiviet.displayImage || baiviet.HinhAnh || '/images/noimage.png' %>" class="img-fluid rounded shadow-sm" style="max-height: 400px; width: 100%; object-fit: cover;" onerror="this.src='/images/noimage.png'">
                                     </div>
                                 <% } %>
 

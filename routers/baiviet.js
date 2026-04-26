@@ -397,9 +397,12 @@ router.get('/:id', async (req, res) => {
             const randomAd = await QuangCao.aggregate([{ $sample: { size: 1 } }])
                 .then(items => (items && items.length > 0 ? items[0] : null));
 
+            const detailArticle = bv.toObject();
+            detailArticle.displayImage = resolveArticleCoverImage(detailArticle.HinhAnh, detailArticle.NoiDung);
+
             res.render('baiviet_chitiet', {
                 title: bv.TieuDe,
-                baiviet: bv,
+                baiviet: detailArticle,
                 tacGia: tacGia,
                 binhluan: dsBinhLuan,
                 quangcao: randomAd,

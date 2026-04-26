@@ -42,7 +42,7 @@
                             <tr>
                                 <td class="align-middle text-center"><%= stt++ %></td>
                                 <td class="align-middle text-center">
-                                    <img src="<%= bv.displayImage || bv.HinhAnh || '/images/noimage.png' %>" width="80" class="img-thumbnail" alt="Thumb" onerror="this.src='/images/noimage.png'">
+                                    <img src="<%- bv.displayImage || bv.HinhAnh || '/images/noimage.png' %>" width="80" class="img-thumbnail" alt="Thumb" onerror="this.src='/images/noimage.png'">
                                 </td>
                                 <td class="align-middle small">
                                     <i class="bi bi-person"></i> <%= bv.TaiKhoan ? bv.TaiKhoan.HoVaTen : 'N/A' %>
