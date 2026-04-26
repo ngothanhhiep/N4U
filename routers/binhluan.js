@@ -34,15 +34,20 @@ const canManage = (req, res, next) => {
 // ROUTE QUẢN LÝ BÌNH LUẬN
 // =========================
 
-// [GET] /binhluan - Danh sách bình luận
+// [GET] /binhluan - Danh sách bình luận (có tìm kiếm theo nội dung)
 router.get('/', canManage, async (req, res) => {
     try {
+        const tukhoa = (req.query.tukhoa || '').trim();
+        const filter = tukhoa
+            ? { NoiDung: { $regex: tukhoa, $options: 'i' } }
+            : {};
+
         const currentPage = Math.max(1, parseInt(req.query.page) || 1);
-        const totalItems = await BinhLuan.countDocuments();
+        const totalItems = await BinhLuan.countDocuments(filter);
         const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
         const page = Math.min(currentPage, totalPages);
 
-        const dsBinhLuan = await BinhLuan.find()
+        const dsBinhLuan = await BinhLuan.find(filter)
             .populate('TaiKhoan', 'HoVaTen TenDangNhap')
             .populate('BaiViet', 'TieuDe')
             .sort({ createdAt: -1 })
@@ -55,7 +60,8 @@ router.get('/', canManage, async (req, res) => {
             currentPage: page,
             totalPages: totalPages,
             pageSize: PAGE_SIZE,
-            totalItems: totalItems
+            totalItems: totalItems,
+            tukhoa: tukhoa
         });
     } catch (err) {
         console.error('Lỗi danh sách bình luận:', err);

@@ -92,6 +92,16 @@
                                     <i class="bi bi-calendar3"></i> Ngày đăng: <%= new Date(baiviet.NgayDang).toLocaleDateString('vi-VN') %> |
                                     <i class="bi bi-eye"></i> Lượt xem: <%= baiviet.LuotXem %>
                                 </p>
+                                <% if(typeof session !== "undefined" && session.MaNguoiDung) { %>
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-danger mb-3"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalBaoCao"
+                                            data-loai="BaiViet"
+                                            data-id="<%= baiviet._id %>">
+                                        <i class="bi bi-flag me-1"></i>Báo cáo vi phạm
+                                    </button>
+                                <% } %>
                                 <hr>
                                 <% if(baiviet.displayImage || baiviet.HinhAnh) { %>
                                     <div class="text-center mb-4">
@@ -178,10 +188,21 @@
                                                             class="btn btn-sm <%= (session.MaNguoiDung && item.LuotKhongThich.includes(session.MaNguoiDung)) ? 'btn-danger' : 'btn-outline-danger' %>">
                                                             <i class="bi bi-hand-thumbs-down"></i> <%= item.LuotKhongThich.length %>
                                                             </a>
-                                                        <% if(typeof session !== "undefined" && (session.QuyenHan == 'admin' || session.MaNguoiDung == (item.TaiKhoan ? item.TaiKhoan._id : null))) { %>
+                                                        <% if(typeof session !== "undefined" && (session.QuyenHan == 'admin' || session.QuyenHan == 'maneger' || session.MaNguoiDung == (item.TaiKhoan ? item.TaiKhoan._id : null))) { %>
                                                             <a href="/binhluan/xoa/<%= item._id %>" class="btn btn-sm btn-outline-secondary border-0 ms-auto text-danger" onclick="return confirm('Xóa bình luận?')">
                                                                 <i class="bi bi-trash"></i>
                                                             </a>
+                                                        <% } %>
+                                                        <% if(typeof session !== "undefined" && session.MaNguoiDung && session.MaNguoiDung != (item.TaiKhoan ? item.TaiKhoan._id : null)) { %>
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-outline-secondary border-0 ms-auto text-warning"
+                                                                    title="Báo cáo bình luận này"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#modalBaoCao"
+                                                                    data-loai="BinhLuan"
+                                                                    data-id="<%= item._id %>">
+                                                                <i class="bi bi-flag"></i>
+                                                            </button>
                                                         <% } %>
                                                     </div>
                                                 </div>
@@ -301,7 +322,123 @@
         <%- include('footer') %>
     </div>
 
+    <!-- Modal báo cáo vi phạm -->
+    <% if(typeof session !== "undefined" && session.MaNguoiDung) { %>
+    <div class="modal fade" id="modalBaoCao" tabindex="-1" aria-labelledby="modalBaoCaoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form id="formBaoCao" action="/baocao" method="POST">
+                    <input type="hidden" name="LoaiDoiTuong" id="baocaoLoai" />
+                    <input type="hidden" name="DoiTuongId" id="baocaoId" />
+                    <input type="hidden" name="redirectTo" id="baocaoRedirect" />
+                    <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title text-danger" id="modalBaoCaoLabel">
+                            <i class="bi bi-flag-fill me-2"></i>Báo cáo vi phạm
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body pt-2">
+                        <p class="text-muted small mb-3" id="baocaoMoTaDoiTuong"></p>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Lý do vi phạm <span class="text-danger">*</span></label>
+                            <div class="d-grid gap-2">
+                                <div class="form-check border rounded p-3">
+                                    <input class="form-check-input" type="radio" name="LyDo" id="lydo1" value="NoiDungNhayCam" required>
+                                    <label class="form-check-label" for="lydo1">
+                                        <i class="bi bi-eye-slash text-warning me-2"></i>
+                                        <strong>Nội dung nhạy cảm</strong>
+                                        <div class="text-muted small">Hình ảnh hoặc nội dung không phù hợp với cộng đồng</div>
+                                    </label>
+                                </div>
+                                <div class="form-check border rounded p-3">
+                                    <input class="form-check-input" type="radio" name="LyDo" id="lydo2" value="NgonNguThoTuc" required>
+                                    <label class="form-check-label" for="lydo2">
+                                        <i class="bi bi-chat-square-x text-danger me-2"></i>
+                                        <strong>Ngôn ngữ thô tục</strong>
+                                        <div class="text-muted small">Sử dụng từ ngữ tục tĩu, xúc phạm</div>
+                                    </label>
+                                </div>
+                                <div class="form-check border rounded p-3">
+                                    <input class="form-check-input" type="radio" name="LyDo" id="lydo3" value="CongKichThuDich" required>
+                                    <label class="form-check-label" for="lydo3">
+                                        <i class="bi bi-person-x text-danger me-2"></i>
+                                        <strong>Công kích / Thù địch</strong>
+                                        <div class="text-muted small">Nội dung kích động, phân biệt đối xử hoặc tấn công cá nhân</div>
+                                    </label>
+                                </div>
+                                <div class="form-check border rounded p-3">
+                                    <input class="form-check-input" type="radio" name="LyDo" id="lydo4" value="TinGiaMaoLua" required>
+                                    <label class="form-check-label" for="lydo4">
+                                        <i class="bi bi-exclamation-triangle text-dark me-2"></i>
+                                        <strong>Tin giả / Lừa đảo</strong>
+                                        <div class="text-muted small">Thông tin sai lệch, gây hiểu nhầm hoặc có dấu hiệu lừa đảo</div>
+                                    </label>
+                                </div>
+                                <div class="form-check border rounded p-3">
+                                    <input class="form-check-input" type="radio" name="LyDo" id="lydo5" value="Khac" required>
+                                    <label class="form-check-label" for="lydo5">
+                                        <i class="bi bi-three-dots text-secondary me-2"></i>
+                                        <strong>Lý do khác</strong>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-1">
+                            <label class="form-label fw-semibold">Mô tả thêm <span class="text-muted fw-normal">(tùy chọn)</span></label>
+                            <textarea name="MoTa" class="form-control" rows="3"
+                                      placeholder="Mô tả rõ hơn về nội dung vi phạm..."
+                                      maxlength="500"></textarea>
+                            <div class="form-text text-end" id="demKyTu">0 / 500</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-flag me-1"></i>Gửi báo cáo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <% } %>
+
     <%- include('javascript')%>
+    <script>
+        // Xử lý modal báo cáo
+        (function () {
+            const modal = document.getElementById('modalBaoCao');
+            if (!modal) return;
+
+            modal.addEventListener('show.bs.modal', function (event) {
+                const btn = event.relatedTarget;
+                const loai = btn.getAttribute('data-loai');
+                const id = btn.getAttribute('data-id');
+
+                document.getElementById('baocaoLoai').value = loai;
+                document.getElementById('baocaoId').value = id;
+                document.getElementById('baocaoRedirect').value = window.location.pathname + window.location.search;
+
+                const moTa = document.getElementById('baocaoMoTaDoiTuong');
+                moTa.textContent = loai === 'BaiViet'
+                    ? 'Bạn đang báo cáo bài viết này. Vui lòng chọn lý do vi phạm.'
+                    : 'Bạn đang báo cáo bình luận này. Vui lòng chọn lý do vi phạm.';
+
+                // Reset form
+                document.getElementById('formBaoCao').reset();
+                document.getElementById('demKyTu').textContent = '0 / 500';
+            });
+
+            // Đếm ký tự textarea
+            const textarea = document.querySelector('#formBaoCao textarea[name="MoTa"]');
+            const demKyTu = document.getElementById('demKyTu');
+            if (textarea && demKyTu) {
+                textarea.addEventListener('input', function () {
+                    demKyTu.textContent = this.value.length + ' / 500';
+                });
+            }
+        })();
+    </script>
     <script>
         (function () {
             const container = document.querySelector('.smart-sidebar-container');
