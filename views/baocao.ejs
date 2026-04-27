@@ -18,9 +18,6 @@
                 <span><i class="bi bi-flag-fill text-danger me-2"></i><%= title %></span>
             </div>
             <div class="card-body">
-
-                <%- include('javascript') %>
-
                 <!-- Thống kê nhanh -->
                 <div class="row g-3 mb-4">
                     <div class="col-6 col-md-3">
@@ -281,30 +278,32 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <%- include('javascript') %>
     <script>
         const modalXuLy = document.getElementById('modalXuLy');
-        modalXuLy.addEventListener('show.bs.modal', function (event) {
-            const btn = event.relatedTarget;
-            const id = btn.getAttribute('data-id');
-            const trangThai = btn.getAttribute('data-trang-thai');
+        if (modalXuLy) {
+            modalXuLy.addEventListener('show.bs.modal', function (event) {
+                const btn = event.relatedTarget;
+                const id = btn.getAttribute('data-id');
+                const trangThai = btn.getAttribute('data-trang-thai');
 
-            document.getElementById('formXuLy').action = '/baocao/' + id + '/xuly';
-            document.getElementById('inputTrangThai').value = trangThai;
+                document.getElementById('formXuLy').action = '/baocao/' + id + '/xuly';
+                document.getElementById('inputTrangThai').value = trangThai;
 
-            const label = document.getElementById('labelXuLy');
-            const btnXacNhan = document.getElementById('btnXacNhan');
+                const label = document.getElementById('labelXuLy');
+                const btnXacNhan = document.getElementById('btnXacNhan');
 
-            if (trangThai === '1') {
-                label.className = 'alert alert-success mb-3';
-                label.textContent = 'Xác nhận báo cáo này là VI PHẠM và xử lý.';
-                btnXacNhan.className = 'btn btn-success';
-            } else {
-                label.className = 'alert alert-secondary mb-3';
-                label.textContent = 'Từ chối báo cáo này (nội dung không vi phạm).';
-                btnXacNhan.className = 'btn btn-secondary';
-            }
-        });
+                if (trangThai === '1') {
+                    label.className = 'alert alert-success mb-3';
+                    label.textContent = 'Xác nhận báo cáo này là VI PHẠM và xử lý.';
+                    btnXacNhan.className = 'btn btn-success';
+                } else {
+                    label.className = 'alert alert-secondary mb-3';
+                    label.textContent = 'Từ chối báo cáo này (nội dung không vi phạm).';
+                    btnXacNhan.className = 'btn btn-secondary';
+                }
+            });
+        }
     </script>
 </body>
 

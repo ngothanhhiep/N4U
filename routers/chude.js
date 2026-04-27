@@ -5,6 +5,7 @@ var BaiViet = require('../models/baiviet');
 var QuangCao = require('../models/quangcao');
 var firstImageFunc = require('../modules/firstimage');
 var mongoose = require('mongoose');
+const PAGE_SIZE = 10;
 
 // =========================
 // MIDDLEWARE DÙNG CHUNG
@@ -114,6 +115,7 @@ router.get('/xoa/:id', checkAuth, async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const id = req.params.id;
+        const currentPage = Math.max(1, parseInt(req.query.page) || 1);
 
         const [cm, cd, xnn, randomAd] = await Promise.all([
             ChuDe.find(),
@@ -129,11 +131,16 @@ router.get('/:id', async (req, res) => {
             return res.status(404).send('Chủ đề không tồn tại.');
         }
 
+        const totalItems = await BaiViet.countDocuments({ ChuDe: id, KiemDuyet: 1 });
+        const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+        const page = Math.min(currentPage, totalPages);
+
         const bv = await BaiViet.find({ ChuDe: id, KiemDuyet: 1 })
             .sort({ NgayDang: -1 })
             .populate('ChuDe')
             .populate('TaiKhoan')
-            .limit(8);
+            .skip((page - 1) * PAGE_SIZE)
+            .limit(PAGE_SIZE);
 
         const baivietWithImage = bv.map(article => {
             const obj = article.toObject();
@@ -153,7 +160,11 @@ router.get('/:id', async (req, res) => {
             chude: cd,
             baiviet: baivietWithImage,
             xemnhieu: xnn,
-            quangcao: randomAd
+            quangcao: randomAd,
+            currentPage: page,
+            totalPages,
+            totalItems,
+            pageSize: PAGE_SIZE
         });
     } catch (err) {
         console.error('Lỗi lấy bài viết theo chủ đề:', err);
